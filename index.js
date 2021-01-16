@@ -1,0 +1,32 @@
+const express = require("express");
+const patientsRouter = require('./routes/patient')
+const app = express();
+// const xlsx = require("xlsx"); 
+// const fs = require("fs"); 
+
+
+app.use(express.json())
+//app.use('/patients', async (req, res) => { await patient})
+
+app.use('/', patientsRouter)
+
+// app.get('/patients', async (req, res) => {
+//     const api_url = "https://www.datos.gov.co/resource/gt2j-8ykr.json"
+//     await fetch(api_url)
+//     .then((response) => response.json())
+//     .then((json) => {console.log(json)})
+//     .catch((error) => {console.log(error)})
+    
+// })
+
+// let fileData = fs.readFileSync("./data.json");  
+// let rawData = JSON.parse(fileData); 
+ 
+// let workbook = xlsx.utils.book_new(); 
+// xlsx.utils.book_append_sheet(workbook, xlsx.utils.json_to_sheet(rawData), "sample"); 
+// xlsx.writeFile(workbook,"result.xlsx"); 
+
+
+app.listen(3000, () => {
+    console.log("server running")
+})
