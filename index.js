@@ -9,6 +9,7 @@ app.use(express.json())
 //app.use('/patients', async (req, res) => { await patient})
 
 app.use('/', patientsRouter)
+app.set('port', process.env.PORT || 3000)
 
 // app.get('/patients', async (req, res) => {
 //     const api_url = "https://www.datos.gov.co/resource/gt2j-8ykr.json"
@@ -27,6 +28,6 @@ app.use('/', patientsRouter)
 // xlsx.writeFile(workbook,"result.xlsx"); 
 
 
-app.listen(3000, () => {
-    console.log("server running")
+app.listen(app.get('port'), () => {
+    console.log("server running on port 3000")
 })
