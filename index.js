@@ -1,9 +1,17 @@
 const express = require("express");
-const patientsRouter = require('./routes/patient')
+var cors = require('cors')
 const app = express();
+const patientsRouter = require('./routes/patient')
 // const xlsx = require("xlsx"); 
 // const fs = require("fs"); 
+app.use(cors())
 
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-RequestedWith, Content-Type, Accept");
+    next();
+   });
+   
 
 app.use(express.json())
 //app.use('/patients', async (req, res) => { await patient})

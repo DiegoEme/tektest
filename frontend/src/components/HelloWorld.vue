@@ -1,15 +1,17 @@
 <template>
   <v-data-table
     :headers="headers"
-    :items="desserts"
-    sort-by="calories"
+    :items="patients"
+    sort-by="ID"
     class="elevation-1"
+    :loading = "cargando"
+    loading-text="Cargando..."
   >
     <template v-slot:top>
       <v-toolbar
         flat
       >
-        <v-toolbar-title>My CRUD</v-toolbar-title>
+        <v-toolbar-title></v-toolbar-title>
         <v-divider
           class="mx-4"
           inset
@@ -28,7 +30,7 @@
               v-bind="attrs"
               v-on="on"
             >
-              New Item
+              Agregar
             </v-btn>
           </template>
           <v-card>
@@ -42,53 +44,44 @@
                   <v-col
                     cols="12"
                     sm="6"
-                    md="4"
+                    md="6"
                   >
                     <v-text-field
-                      v-model="editedItem.name"
-                      label="Dessert name"
+                      v-model="editedItem.id_de_caso"
+                      label="ID"
                     ></v-text-field>
                   </v-col>
                   <v-col
                     cols="12"
                     sm="6"
-                    md="4"
+                    md="6"
                   >
                     <v-text-field
-                      v-model="editedItem.calories"
-                      label="Calories"
+                      v-model="editedItem.departamento_nom"
+                      label="Ciudad"
                     ></v-text-field>
                   </v-col>
                   <v-col
                     cols="12"
                     sm="6"
-                    md="4"
+                    md="6"
                   >
                     <v-text-field
-                      v-model="editedItem.fat"
-                      label="Fat (g)"
+                      v-model="editedItem.edad"
+                      label="Edad"
                     ></v-text-field>
                   </v-col>
                   <v-col
                     cols="12"
                     sm="6"
-                    md="4"
+                    md="6"
                   >
                     <v-text-field
-                      v-model="editedItem.carbs"
-                      label="Carbs (g)"
+                      v-model="editedItem.sexo"
+                      label="Sexo"
                     ></v-text-field>
                   </v-col>
-                  <v-col
-                    cols="12"
-                    sm="6"
-                    md="4"
-                  >
-                    <v-text-field
-                      v-model="editedItem.protein"
-                      label="Protein (g)"
-                    ></v-text-field>
-                  </v-col>
+                  
                 </v-row>
               </v-container>
             </v-card-text>
@@ -100,24 +93,24 @@
                 text
                 @click="close"
               >
-                Cancel
+                Cancelar
               </v-btn>
               <v-btn
                 color="blue darken-1"
                 text
                 @click="save"
               >
-                Save
+                Guardar
               </v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
         <v-dialog v-model="dialogDelete" max-width="500px">
           <v-card>
-            <v-card-title class="headline">Are you sure you want to delete this item?</v-card-title>
+            <v-card-title class="headline">Está seguro que quiere eliminar?</v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn color="blue darken-1" text @click="closeDelete">Cancel</v-btn>
+              <v-btn color="blue darken-1" text @click="closeDelete">Cancelar</v-btn>
               <v-btn color="blue darken-1" text @click="deleteItemConfirm">OK</v-btn>
               <v-spacer></v-spacer>
             </v-card-actions>
@@ -152,46 +145,49 @@
 </template>
 
 <script>
+import axios from 'axios';
+
   export default {
     name: 'HelloWorld',
 
 data: () => ({
       dialog: false,
       dialogDelete: false,
+      cargando: true,
       headers: [
         {
-          text: 'Dessert (100g serving)',
+          text: 'ID',
           align: 'start',
-          sortable: false,
-          value: 'name',
+          sortable: true,
+          value: 'id_de_caso',
         },
-        { text: 'Calories', value: 'calories' },
-        { text: 'Fat (g)', value: 'fat' },
-        { text: 'Carbs (g)', value: 'carbs' },
-        { text: 'Protein (g)', value: 'protein' },
+        { text: 'Ciudad', value: 'departamento_nom' },
+        { text: 'Edad', value: 'edad' },
+        { text: 'Sexo', value: 'sexo' },
+       
         { text: 'Actions', value: 'actions', sortable: false },
       ],
       desserts: [],
+      patients: [],
       editedIndex: -1,
       editedItem: {
-        name: '',
-        calories: 0,
-        fat: 0,
-        carbs: 0,
-        protein: 0,
+        id_de_caso: '',
+        departamento_nom: '',
+        edad: '',
+        sexo: '',
+        
       },
       defaultItem: {
-        name: '',
-        calories: 0,
-        fat: 0,
-        carbs: 0,
-        protein: 0,
+        id_de_caso: '',
+        departamento_nom: '',
+        edad: '',
+        sexo: '',
       },
     }),
 
     computed: {
       formTitle () {
-        return this.editedIndex === -1 ? 'New Item' : 'Edit Item'
+        return this.editedIndex === -1 ? 'Nuevo caso' : 'Editar caso'
       },
     },
 
@@ -206,6 +202,7 @@ data: () => ({
 
     created () {
       this.initialize()
+      this.list();
     },
 
     methods: {
@@ -221,21 +218,41 @@ data: () => ({
           
         ]
       },
+      list() {
+        axios.get('http://localhost:3000/patients')
+        .then(response => {
+          this.patients = response.data;
+          this.cargando = false;
+          console.log(this.patients)
+        })
+        .catch(error => {
+          console.log(error)
+          return error})
+      },
 
       editItem (item) {
-        this.editedIndex = this.desserts.indexOf(item)
+        this.editedIndex = item.id_de_caso;
         this.editedItem = Object.assign({}, item)
         this.dialog = true
       },
 
       deleteItem (item) {
-        this.editedIndex = this.desserts.indexOf(item)
+        this.editedIndex = item.id_de_caso
         this.editedItem = Object.assign({}, item)
+        console.log(this.editedItem.id_de_caso)
         this.dialogDelete = true
       },
 
       deleteItemConfirm () {
-        this.desserts.splice(this.editedIndex, 1)
+        //this.desserts.splice(this.editedIndex, 1)
+        axios.delete('http://localhost:3000/delete', {data:{ "id_de_caso": this.editedItem.id_de_caso}})
+        .then(response => {
+            console.log(response);
+            this.list()
+          }).catch(error => {
+            console.log(error)
+            return error
+          })
         this.closeDelete()
       },
 
@@ -257,9 +274,35 @@ data: () => ({
 
       save () {
         if (this.editedIndex > -1) {
-          Object.assign(this.desserts[this.editedIndex], this.editedItem)
+        axios.put("http://localhost:3000/update", {
+        "id_de_caso": this.editedItem.id_de_caso,
+        "departamento_nom": this.editedItem.departamento_nom,
+        "Edad": this.editedItem.edad,
+        "Sexo": this.editedItem.sexo
+          })
+          .then(response => {
+            console.log(response);
+            this.list()
+          }).catch(error => {
+            console.log(error)
+            return error
+          })
+          //Object.assign(this.desserts[this.editedIndex], this.editedItem)
         } else {
-          this.desserts.push(this.editedItem)
+          //this.desserts.push(this.editedItem)
+          axios.post("http://localhost:3000/add", {
+        "id_de_caso": this.editedItem.id_de_caso,
+        "departamento_nom": this.editedItem.departamento_nom,
+        "edad": this.editedItem.edad,
+        "sexo": this.editedItem.sexo
+          })
+          .then(response => {
+            console.log(response);
+            this.list()
+          }).catch(error => {
+            console.log(error)
+            return error
+          })
         }
         this.close()
       },
