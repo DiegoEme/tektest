@@ -1,4 +1,8 @@
 <template>
+
+<div>
+  
+
   <v-data-table
     :headers="headers"
     :items="patients"
@@ -118,7 +122,7 @@
         </v-dialog>
       </v-toolbar>
     </template>
-    <template v-slot:item.actions="{ item }">
+    <template v-slot:[`item.actions`]="{ item }">
       <v-icon
         small
         class="mr-2"
@@ -142,10 +146,15 @@
       </v-btn>
     </template>
   </v-data-table>
+</div>
+
+
+
 </template>
 
 <script>
 import axios from 'axios';
+
 
   export default {
     name: 'HelloWorld',
@@ -167,7 +176,7 @@ data: () => ({
        
         { text: 'Actions', value: 'actions', sortable: false },
       ],
-      desserts: [],
+     
       patients: [],
       editedIndex: -1,
       editedItem: {
@@ -189,6 +198,7 @@ data: () => ({
       formTitle () {
         return this.editedIndex === -1 ? 'Nuevo caso' : 'Editar caso'
       },
+      
     },
 
     watch: {
@@ -206,18 +216,8 @@ data: () => ({
     },
 
     methods: {
-      initialize () {
-        this.desserts = [
-          {
-            name: 'Frozen Yogurt',
-            calories: 159,
-            fat: 6.0,
-            carbs: 24,
-            protein: 4.0,
-          }
-          
-        ]
-      },
+      
+      initialize (){},
       list() {
         axios.get('http://localhost:3000/patients')
         .then(response => {
@@ -229,7 +229,7 @@ data: () => ({
           console.log(error)
           return error})
       },
-
+     
       editItem (item) {
         this.editedIndex = item.id_de_caso;
         this.editedItem = Object.assign({}, item)
